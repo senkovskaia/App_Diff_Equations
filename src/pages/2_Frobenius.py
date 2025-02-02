@@ -1,14 +1,31 @@
 import streamlit as st
 import sympy as sp
-from sympy import symbols, Eq, solve, summation, sympify
+from sympy import symbols, Eq, solve, sympify
 import plotly.graph_objects as go
 import numpy as np
 
 st.set_page_config(layout="wide")
 
-def compute_a_coefficients(p_dict, q_dict, r, n_max, a0_val):
+# Define x symbol globally
+x = symbols('x')
+
+def compute_a_coefficients(p_dict: dict[int, sp.Expr], 
+                           q_dict: dict[int, sp.Expr], 
+                           r: sp.Symbol, 
+                           n_max: int, 
+                           a0_val: sp.Expr
+                           ) -> dict[int, sp.Expr]:
     """
     Computes the coefficients a_n recursively up to n_max.
+    Args:
+        p_dict (dict): Dictionary of coefficients for P(x).
+        q_dict (dict): Dictionary of coefficients for Q(x).
+        r (sympy.Expr): Indicial root.
+        n_max (int): Maximum order for computation.
+        a0_val (float): Initial coefficient a0.
+
+    Returns:
+        dict: Computed coefficients a_n.
     """
     a = symbols('a_0:%d' % (n_max + 1))
     
@@ -36,17 +53,22 @@ def compute_a_coefficients(p_dict, q_dict, r, n_max, a0_val):
     return a_values
     
 
-def convert_to_integer_keys(input_dict, n):
+def convert_to_integer_keys(input_dict: dict[sp.Symbol, sp.Expr], n: int) -> dict[int, sp.Expr]:
     """
     Converts a dictionary with keys as powers of x (e.g., x, x^2) to one with integer keys.
+
+    Args:
+        input_dict (dict): SymPy dictionary of coefficients.
+        n (int): Maximum power to consider.
+
+    Returns:
+        dict: Dictionary with integer keys representing polynomial degrees.
     """
     x = symbols('x')
     output_dict = {}
     
-    #max_power = max(key.as_poly(x).degree() if key.has(x) else 0 for key in input_dict.keys())
-
     # Fill the dictionary for all powers up to max_power
-    for power in range(n+1):#range(max_power + 1):
+    for power in range(n+1): 
         output_dict[power] = 0  # Default value for missing powers
 
     for key, value in input_dict.items():
@@ -56,6 +78,7 @@ def convert_to_integer_keys(input_dict, n):
             # Extract the power of x from the symbolic key
             power = key.as_poly(x).degree() if key.has(x) else 0
             output_dict[power] = value
+    
     return output_dict
 
 
@@ -83,9 +106,6 @@ with col1:
     st.latex(r"x^2Q(x) =")
 with col2:
     x2Q_input = st.text_input("Enter polynomial x^2Q(x):", "x")
-
-# Variable for expressions
-x = symbols('x')
 
 # Convert input to SymPy expressions
 try:
@@ -238,7 +258,7 @@ else:
         x_vals = np.linspace(0.1, 5, 500)
         x_vals = x_vals[x_vals > 0]  # Avoid x = 0 due to log(x)
 
-        def compute_y_symbolic(a_values, r):
+        def compute_y_symbolic(a_values: dict[int, sp.Expr], r: sp.Symbol) -> sp.Expr:
             """
             Compute the Frobenius series solution y(x) for given coefficients.
             """

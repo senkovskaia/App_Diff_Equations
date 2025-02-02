@@ -1,7 +1,6 @@
 import streamlit as st
 import sympy as sp
 import numpy as np
-from sympy import symbols, Function, Eq, expand, collect, sympify
 import plotly.graph_objs as go
 
 st.set_page_config(layout="wide")
@@ -12,13 +11,29 @@ y = sp.Function('y')(x)
 a0, a1 = sp.symbols('a0 a1')
 
 # Function to compute coefficients
-def compute_coefficients(N, P, Q, a0=a0, a1=a1):
+def compute_coefficients(N: int, P: sp.Expr, Q: sp.Expr, a0: float=a0, a1: float=a1) -> tuple[list, list]:
+    """
+    Computes power series coefficients for the differential equation y'' + P(x)y' + Q(x)y = 0.
+    
+    Args:
+        N (int): Order of approximation.
+        P (sp.Expr): Polynomial P(x).
+        Q (sp.Expr): Polynomial Q(x).
+        a0 (symbol): Initial coefficient.
+        a1 (symbol): First-order coefficient.
+    
+    Returns:
+        tuple: (list of computed coefficients, list of recurrence equations)
+    """
     coefficients = [a0, a1]
     
     # Get the power series expansions for P(x) and Q(x)
-    p_series = sp.series(P, x, 0, N).removeO().as_poly(x).all_coeffs()[::-1]
-    q_series = sp.series(Q, x, 0, N).removeO().as_poly(x).all_coeffs()[::-1]
-
+    try:
+        p_series = sp.series(P, x, 0, N).removeO().as_poly(x).all_coeffs()[::-1]
+        q_series = sp.series(Q, x, 0, N).removeO().as_poly(x).all_coeffs()[::-1]
+    except:
+        raise ValueError("P(x) and Q(x) must be valid polynomials.")
+    
     # Pad p_series and q_series to ensure they are at least length N
     p_series += [0] * (N - len(p_series))
     q_series += [0] * (N - len(q_series))
@@ -47,7 +62,6 @@ def compute_coefficients(N, P, Q, a0=a0, a1=a1):
 # Streamlit app
 st.title("Power Series Method for Differential Equations")
 
-# Display the differential equation in LaTeX
 st.latex(r"y'' + P(x) y' + Q(x) y = 0 \quad \text{(1)}")
 
 # User input for polynomials P(x) and Q(x)
@@ -88,7 +102,6 @@ else:
         st.latex(f"a_{{{i}}} = {sp.latex(coeff)}")
 
     # Construct y as a power series
-    
     y_series = sum(coeff * x**i for i, coeff in enumerate(coeffs))
     st.write("### Power Series Solution:")
     st.latex(f"y = {sp.latex(y_series)}")
@@ -133,7 +146,27 @@ else:
     fig = go.Figure()
 
     # Plot partial sums of the series solution
-    def get_series_approx(x_vals, coeffs, num_terms, a0_val, a1_val):
+
+    def get_series_approx(
+        x_vals: np.ndarray, 
+        coeffs: list[sp.Expr], 
+        num_terms: int, 
+        a0_val: float, 
+        a1_val: float
+    ) -> list[float]:
+        """
+        Computes partial sums of the power series solution.
+
+        Args:
+            x_vals (np.ndarray): Array of x-values where the series is evaluated.
+            coeffs (List[Expr]): List of symbolic coefficients of the power series.
+            num_terms (int): Number of terms to include in the series approximation.
+            a0_val (float): Value of coefficient a0.
+            a1_val (float): Value of coefficient a1.
+
+        Returns:
+            List[float]: List of evaluated y-values corresponding to x_vals.
+        """
         y_vals = []
         for x_val in x_vals:
             y_val = sum(float(coeff.subs({a0: a0_val, a1: a1_val})) * (x_val ** i) for i, coeff in enumerate(coeffs[:num_terms]))
@@ -146,15 +179,18 @@ else:
 
     if general_solution_available:
         # Update general solution with user-defined constants and plot it
-        updated_general_solution_with_values = general_solution_rhs.subs(gen_constant_values)
-        general_solution_func = sp.lambdify(x, updated_general_solution_with_values, 'numpy')
-        gen_solution_y_vals = general_solution_func(x_vals)
+        try:
+            updated_general_solution_with_values = general_solution_rhs.subs(gen_constant_values)
+            general_solution_func = sp.lambdify(x, updated_general_solution_with_values, 'numpy')
+            gen_solution_y_vals = general_solution_func(x_vals)
 
-        if np.all(gen_solution_y_vals == 0):
-            gen_solution_y_vals = np.zeros_like(x_vals)  
-        
-        fig.add_trace(go.Scatter(x=x_vals, y=gen_solution_y_vals, mode='lines', name="General Solution",
-                                 line=dict(color='black', dash='dash')))
+            if np.all(gen_solution_y_vals == 0):
+                gen_solution_y_vals = np.zeros_like(x_vals)  
+            
+            fig.add_trace(go.Scatter(x=x_vals, y=gen_solution_y_vals, mode='lines', name="General Solution",
+                                    line=dict(color='black', dash='dash')))
+        except Exception as e:
+            st.error(f"ERROR: Invalid expression for the general solution {general_solution_with_values}: {e}")
     
     # Plot settings
     fig.update_layout(
@@ -183,5 +219,5 @@ else:
     fig.update_xaxes(zeroline=True, zerolinewidth=2, showgrid=True)
     fig.update_yaxes(zeroline=True, zerolinewidth=2, showgrid=True)
 
-    # Show the plot in Streamlit    
+    # Show the plot    
     st.plotly_chart(fig, use_container_width=True)

@@ -1,8 +1,9 @@
-## Power Series & Frobenius Method Solver
+## Differential Equations App
 
-This a **Streamlit** application that is part of the **bachelor's thesis of Klavdiia Senkovskaia**, focusing on interactive solutions for solving differential equations using power series methods. It focuses on providing an interactive approach to solving differential equations using:
+This a **Streamlit** application that is part of the **bachelor's thesis of Klavdiia Senkovskaia**, designed to interactively demonstrate solutions to differential equations using power series. It focuses on providing an interactive approach to solving differential equations using:
 
 1. **Power Series Method**
+
 2. **Frobenius Method**
 
 It provides interactive inputs, symbolic computations using **SymPy**, and visual plots using **Plotly**.
@@ -42,12 +43,6 @@ poetry shell
 ```sh
 streamlit run src/Start.py
 ```
-
-## Usage
-- Enter the polynomial coefficients for `P(x)` and `Q(x)`.
-- Adjust the order `N` for calculations.
-- View computed coefficients and recurrence relations.
-- Visualize solutions interactively.
 
 ## File Structure
 ```
