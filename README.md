@@ -9,11 +9,13 @@ This a **Streamlit** application that is part of the **bachelor's thesis of Klav
 It provides interactive inputs, symbolic computations using **SymPy**, and visual plots using **Plotly**.
 
 ## Features
-- Compute coefficients for power series solutions using symbolic differentiation.
-- Solve linear differential equations with variable coefficients.
-- Recurrence relations for finding coefficients of power series expansions.
+- Solving linear homogeneous differential equations of the second order using power series.
+
+- Finding coefficients for power series via a recurrence equation.
+
+- Finding a solution to a differential equation using power series at ordinary points and using the Frobenius method at singular points.
+
 - Interactive visualization of solutions using numerical approximation.
-- Handles different cases of the Frobenius method, including singular points.
 
 ## Hosted Application
 
