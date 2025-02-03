@@ -104,7 +104,7 @@ else:
     # Construct y as a power series
     y_series = sum(coeff * x**i for i, coeff in enumerate(coeffs))
     st.write("### Power Series Solution:")
-    st.latex(f"y = {sp.latex(y_series)}")
+    st.latex(f"y(x) = {sp.latex(y_series)}")
    
 
     # Display general solution if possible
