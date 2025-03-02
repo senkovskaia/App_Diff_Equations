@@ -154,10 +154,11 @@ else:
             \quad \text{(4)}
             """)
 
-    #st.write("The first equation (a0 ≠ 0):")
+
     st.latex(r"r(r-1) + rp_0 + q_0 = 0 \quad \text{(5)}")
     st.latex(r"p_0 = %s, \quad q_0 = %s" % (sp.latex(p0), sp.latex(q0)))
     st.latex(sp.latex(indicial_eq) + " = 0")
+    
     # Display the roots
     r1 = roots[0]
     if len(roots) == 1:
@@ -302,7 +303,7 @@ else:
         # Combine y1 and y2 with C1 and C2
         y_combined_vals = C1_val * y1_vals + C2_val * y2_vals
 
-        # Plotting using Plotly
+        # Add figure
         fig = go.Figure()
 
         # Add traces for y1, y2, and y_combined
@@ -311,24 +312,28 @@ else:
         fig.add_trace(go.Scatter(x=x_vals, y=y_combined_vals, mode='lines', name='y = C1*y1 + C2*y2',
                                  line=dict(color='black', dash='dash')))
 
-        # Layout configuration
+        # Plot settings
         fig.update_layout(
             xaxis_title="x",
             yaxis_title="y(x)",
             template="plotly_white",
             height=700,
-            legend=dict(font=dict(size=18)),
+            legend=dict(font=dict(size=24)),
             annotations=[
             dict(
                 xref="paper", yref="paper",
                 x=0.5, y=1.15,
                 text=f"a0 = {a0}, C1 = {C1_val}, C2 = {C2_val}" + (f", C = {C}" if C else ""),
                 showarrow=False,
-                font=dict(size=18)
+                font=dict(size=24, color="black")
             )
-        ]
+            ]
         )
-        fig.update_xaxes(zeroline=True, zerolinewidth=2, showgrid=True)
-        fig.update_yaxes(zeroline=True, zerolinewidth=2, showgrid=True)
+
+        fig.update_xaxes(zeroline=True, tickfont=dict(size=20, color="black"), title_font=dict(size=20, color="black"), 
+                         zerolinewidth=2, showgrid=True, linecolor="black")
+    
+        fig.update_yaxes(zeroline=True, tickfont=dict(size=20, color="black"), title_font=dict(size=20, color="black"), 
+                         zerolinewidth=2, showgrid=True, linecolor="black")
 
         st.plotly_chart(fig)

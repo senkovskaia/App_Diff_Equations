@@ -143,9 +143,9 @@ else:
 
     # Generate x values and evaluate the general solution (if available)
     x_vals = np.linspace(-1, 1, 100)
-    fig = go.Figure()
 
-    # Plot partial sums of the series solution
+    # Plot settings
+    fig = go.Figure()
 
     def get_series_approx(
         x_vals: np.ndarray, 
@@ -159,13 +159,13 @@ else:
 
         Args:
             x_vals (np.ndarray): Array of x-values where the series is evaluated.
-            coeffs (List[Expr]): List of symbolic coefficients of the power series.
+            coeffs (list[sp.Expr]): List of symbolic coefficients of the power series.
             num_terms (int): Number of terms to include in the series approximation.
             a0_val (float): Value of coefficient a0.
             a1_val (float): Value of coefficient a1.
 
         Returns:
-            List[float]: List of evaluated y-values corresponding to x_vals.
+            list[float]: List of evaluated y-values corresponding to x_vals.
         """
         y_vals = []
         for x_val in x_vals:
@@ -197,27 +197,29 @@ else:
         height=700,
         xaxis_title="x",
         yaxis_title="y(x)",
-        legend=dict(font=dict(size=18)),
+        legend=dict(font=dict(size=24)),
         annotations=[
             dict(
                 xref="paper", yref="paper",
                 x=0.5, y=1.15,
                 text=f"a0 = {a0_val}, a1 = {a1_val}",
                 showarrow=False,
-                font=dict(size=18)
+                font=dict(size=24, color="black")
             ),
             dict(
                 xref="paper", yref="paper",
                 x=0.5, y=1.10,
                 text=", ".join([f"{const} = {gen_constant_values[const]}" for const in gen_constants]),
                 showarrow=False,
-                font=dict(size=18)
+                font=dict(size=24, color="black")
             ) if general_solution_available else {}
         ]
     )
 
-    fig.update_xaxes(zeroline=True, zerolinewidth=2, showgrid=True)
-    fig.update_yaxes(zeroline=True, zerolinewidth=2, showgrid=True)
-
-    # Show the plot    
+    fig.update_xaxes(zeroline=True, tickfont=dict(size=20, color="black"), title_font=dict(size=20, color="black"), 
+                     zerolinewidth=2, showgrid=True, linecolor="black")
+    
+    fig.update_yaxes(zeroline=True, tickfont=dict(size=20, color="black"), title_font=dict(size=20, color="black"), 
+                     zerolinewidth=2, showgrid=True, linecolor="black")
+   
     st.plotly_chart(fig, use_container_width=True)
